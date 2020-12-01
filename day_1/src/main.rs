@@ -17,8 +17,7 @@ fn read_from_file(path: &str) -> Vec<i32> {
     return data;
 }
 
-fn main() {
-    println!("Hello, world!");
+fn part_1(){
     let mut input_data = read_from_file("/home/jeremy/github/aoc_2020/day_1/input/input_1.txt");
     input_data.sort();
 
@@ -31,4 +30,33 @@ fn main() {
             Err(_err) => {}
         }
     }
+}
+
+fn part_2(){
+    let mut input_data = read_from_file("/home/jeremy/github/aoc_2020/day_1/input/input_1.txt");
+    input_data.sort();
+
+    for num_1 in &input_data {
+        for num_2 in &input_data{
+
+            let elem = 2020 - (num_1 + num_2);
+            if elem > 0{
+                match input_data.binary_search(&elem) {
+                    Ok(idx) => {
+                        println!("{}*{}*{}={}", num_1,num_2, input_data[idx], num_1 * num_2 * input_data[idx])
+                    }
+                    Err(_err) => {}
+                }
+
+            }
+        }
+   }
+}
+
+fn main() {
+    println!("Part 1");
+    part_1();
+
+    println!("Part 2");
+    part_2();
 }
