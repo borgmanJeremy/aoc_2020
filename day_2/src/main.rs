@@ -42,7 +42,7 @@ fn main() {
 
     println!("Part 1");
     let mut valid_count = 0;
-    for password in input_data {
+    for password in &input_data {
         let count = password.password.matches(password.letter).count() as u32;
         if (count <= password.max) && (count >= password.min) {
             valid_count += 1;
@@ -51,10 +51,9 @@ fn main() {
     println!("There are {} valid", valid_count);
 
 
-    let input_data_2 = read_from_file("/home/jeremy/github/aoc_2020/day_2/input/input_1.txt");
     println!("Part 2");
     valid_count = 0;
-    for password in input_data_2 {
+    for password in input_data {
         let first_pos = password.password.as_bytes()[(password.min - 1) as usize] as char == password.letter;
         let last_pos = password.password.as_bytes()[(password.max - 1) as usize] as char == password.letter;
 
