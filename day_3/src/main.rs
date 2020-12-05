@@ -7,14 +7,14 @@ use std::io::BufReader;
 
 #[derive(Debug,PartialEq)]
 pub struct Point {
-    pub x: i32,
-    pub y: i32,
+    pub x: i64,
+    pub y: i64,
 }
 
 #[derive(Debug,PartialEq)]
 pub struct Slope {
-    pub run: i32,
-    pub rise: i32,
+    pub run: i64,
+    pub rise: i64,
 }
 
 pub fn parse_map_to_vector(path: &str) -> (Vec<Point>, usize, usize) {
@@ -36,7 +36,7 @@ pub fn parse_map_to_vector(path: &str) -> (Vec<Point>, usize, usize) {
         for idx in 0..char_array.len() {
             if char_array[idx] as char == '#' {
                 point_vec.push(Point {
-                    x: idx as i32,
+                    x: idx as i64,
                     y: line_count,
                 })
             }
@@ -46,7 +46,7 @@ pub fn parse_map_to_vector(path: &str) -> (Vec<Point>, usize, usize) {
     return (point_vec, width, height);
 }
 
-pub fn count_trees(map: &Vec<Point>, width: i32, height: i32, slope: Slope) -> i32{
+pub fn count_trees(map: &Vec<Point>, width: i64, height: i64, slope: Slope) -> i64{
 
     let mut p = Point { x: 0, y: 0 };
 
@@ -69,9 +69,10 @@ pub fn count_trees(map: &Vec<Point>, width: i32, height: i32, slope: Slope) -> i
 
 fn main() {
     let map_details = parse_map_to_vector("/home/jeremy/github/aoc_2020/day_3/input/input_1.txt");
+    //let map_details = parse_map_to_vector("/home/jeremy/github/nic_aoc/data/raw/day3_input.txt");
     let map = map_details.0;
-    let width = map_details.1 as i32;
-    let height = map_details.2 as i32;
+    let width = map_details.1 as i64;
+    let height = map_details.2 as i64;
 
     let mut tree_count = 1;
 
