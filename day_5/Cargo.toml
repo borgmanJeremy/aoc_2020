@@ -1,0 +1,18 @@
+[package]
+name = "day_5"
+version = "0.1.0"
+authors = ["Jeremy Borgman <borgman.jeremy@pm.me>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "boardingpass"
+path = "src/boardingpass.rs"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[dependencies]
+num = "0.3"
