@@ -64,14 +64,12 @@ impl Cpu {
     }
 }
 
-
-fn main() {
+fn part_1() {
     let mut cpu = Cpu::new();
     cpu.load_program("/home/jeremy/github/aoc_2020/day_8/input/input_1.txt");
 
     let mut pc_history = Vec::new();
     pc_history.push(0);
-
     loop {
         let old_acc = cpu.registers.acc;
         cpu.step();
@@ -81,4 +79,54 @@ fn main() {
         }
         pc_history.push(cpu.registers.pc);
     }
+}
+
+fn detect_loop(cpu: &mut Cpu) -> bool {
+    let mut pc_history = Vec::new();
+    pc_history.push(0);
+
+    let mut found_loop = false;
+
+    loop {
+        cpu.step();
+        if pc_history.contains(&cpu.registers.pc) {
+            found_loop = true;
+            break;
+        }
+        if cpu.registers.pc == 626 {
+            return false;
+        }
+        pc_history.push(cpu.registers.pc);
+    }
+    found_loop
+}
+
+fn part_2() {
+    let mut cpu = Cpu::new();
+    cpu.load_program("/home/jeremy/github/aoc_2020/day_8/input/input_1.txt");
+    let orig_cpu = cpu.memory.clone();
+
+    for idx in 0..cpu.memory.len() {
+        match detect_loop(&mut cpu) {
+            true => {
+                cpu.memory = orig_cpu.clone();
+                cpu.registers.acc = 0;
+                cpu.registers.pc = 0;
+                match cpu.memory[idx].opcode.as_str() {
+                    "nop" => { cpu.memory[idx].opcode = String::from("jmp"); }
+                    "jmp" => { cpu.memory[idx].opcode = String::from("nop"); }
+                    _ => {}
+                }
+            }
+            false => {
+                println!("Acc Value is: {}",cpu.registers.acc);
+                break;
+            }
+        }
+    }
+}
+
+fn main() {
+    part_1();
+    part_2();
 }
