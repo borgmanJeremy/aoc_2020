@@ -117,7 +117,7 @@ fn walk_values(initial_value: String, count: i32,  sum: &mut i32, list: &Vec<Bag
                 total += value*count;
                 *sum =(value*count + *sum);
                 walk_values(key.clone(), count * value, sum, &list);
-                println!("({}, {}), {}", key, value,count*value );
+                //println!("({}, {}), {}", key, value,count*value );
             }
         }
         else {
@@ -154,5 +154,6 @@ fn part_2(path: &str) {
 
 fn main() {
     part_1("/home/jeremy/github/aoc_2020/day_7/input/input_1.txt");
+    part_1("/home/jeremy/github/nic_aoc/data/raw/day7_input.txt");
     part_2("/home/jeremy/github/aoc_2020/day_7/input/input_1.txt");
 }
