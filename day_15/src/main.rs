@@ -3,7 +3,7 @@ use ::std::collections::HashMap;
 #[derive(Debug, Clone)]
 struct Buff {
     n: i32,
-    n_1: i32,
+    n_1: Option<i32>,
 }
 
 fn parse_file() -> Vec<i32> {
@@ -15,45 +15,49 @@ fn parse_file() -> Vec<i32> {
     input_str
 }
 
+fn what_to_say(history: &HashMap<i32, Buff>, last_said: i32, was_first_said: bool) -> i32 {
+    if was_first_said {
+        0
+    } else {
+        let buff = history[&last_said].clone();
+        buff.n - buff.n_1.unwrap()
+    }
+}
+
+fn say(history: &mut HashMap<i32, Buff>, value: i32, turn_number: i32) -> bool {
+    if history.contains_key(&value) {
+        let old_turn_number = history[&value].n;
+        let new_buff = Buff { n: turn_number, n_1: Some(old_turn_number) };
+        history.insert(value, new_buff);
+        //println!("{} {}", turn_number, value);
+        false
+    } else {
+        history.insert(value, Buff { n: turn_number, n_1: None });
+        //println!("{} {}", turn_number, value);
+        true
+    }
+}
+
 fn main() {
     let input = parse_file();
-    let mut turn_count = 1;
     let turn_limit = 30000000;
 
-    let mut vec_history = Vec::new();
+    let mut history = HashMap::new();
 
-    for num in input {
-        vec_history.push(num);
-        //println!("{}, {}", turn_count, num);
-        turn_count += 1;
+
+    let mut was_first = false;
+    for (turn, val) in input.iter().enumerate() {
+        was_first = say(&mut history, *val, turn as i32 + 1);
     }
 
+    let mut said = 0;
 
-    let mut last_spoke = 0;
-    vec_history.push(0);
-    //println!("{}, {}", turn_count, 0);
-    turn_count += 1;
-
-    for idx in turn_count..turn_limit+1 {
-        let mut iter = vec_history.iter();
-        let most_recent = iter.rposition(|&x| x == last_spoke);
-        let second_most_recent = iter.rposition(|&x| x == last_spoke);
-        if second_most_recent.is_none() {
-            let speak = 0;
-            vec_history.push(speak as i32);
-            last_spoke = speak as i32;
-            //println!("{}, {}", turn_count, speak);
-        } else {
-            let speak = most_recent.unwrap() - second_most_recent.unwrap();
-            vec_history.push(speak as i32);
-            last_spoke = speak as i32;
-            //println!("{}, {}", turn_count, speak);
+    for turn in (input.len() as i32 + 1)..turn_limit + 1 {
+        said = what_to_say(&history, said, was_first);
+        was_first = say(&mut history, said, turn);
+        if turn % 10000 == 0 {
+            println!("{}%", (turn as f32 / turn_limit as f32) * 100.);
         }
-        turn_count += 1;
-        //if turn_count % 10000 == 0{
-        //    println!("{}%", (turn_count as f32 / turn_limit as f32)*100.);
-        //}
     }
-
-    println!("{}, {}", turn_count, last_spoke);
+    println!("{:?}", said);
 }
