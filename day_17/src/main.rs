@@ -7,6 +7,7 @@ struct Coordinate {
     x: i32,
     y: i32,
     z: i32,
+    w: i32,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -26,51 +27,56 @@ impl Map {
         Map { map: HashMap::new() }
     }
 
-    fn print_map(&self) {
-        println!("");
-        let min_x = self.map.clone().into_keys().map(|x| x.x).min().unwrap();
-        let max_x = self.map.clone().into_keys().map(|x| x.x).max().unwrap();
+    //fn print_map(&self) {
+    //    println!("");
+    //    let min_x = self.map.clone().into_keys().map(|x| x.x).min().unwrap();
+    //    let max_x = self.map.clone().into_keys().map(|x| x.x).max().unwrap();
 
-        let min_y = self.map.clone().into_keys().map(|x| x.y).min().unwrap();
-        let max_y = self.map.clone().into_keys().map(|x| x.y).max().unwrap();
+    //    let min_y = self.map.clone().into_keys().map(|x| x.y).min().unwrap();
+    //    let max_y = self.map.clone().into_keys().map(|x| x.y).max().unwrap();
 
-        let min_z = self.map.clone().into_keys().map(|x| x.z).min().unwrap();
-        let max_z = self.map.clone().into_keys().map(|x| x.z).max().unwrap();
+    //    let min_z = self.map.clone().into_keys().map(|x| x.z).min().unwrap();
+    //    let max_z = self.map.clone().into_keys().map(|x| x.z).max().unwrap();
 
-        for z in min_z..max_z + 1 {
-            println!("z={}", z);
-            for y in (min_y..max_y + 1).rev() {
-                for x in min_x..max_x + 1 {
-                    if !self.map.contains_key(&Coordinate { x, y, z }) {
-                        print!("!");
-                    } else {
-                        match (self.map[&Coordinate { x, y, z }])
-                        {
-                            Status::Active => { print!("#") }
-                            Status::Inactive => { print!(".") }
-                        }
-                    }
-                }
-                println!("");
-            }
-        }
-    }
+    //    for z in min_z..max_z + 1 {
+    //        println!("z={}", z);
+    //        for y in (min_y..max_y + 1).rev() {
+    //            for x in min_x..max_x + 1 {
+    //                if !self.map.contains_key(&Coordinate { x, y, z }) {
+    //                    print!("!");
+    //                } else {
+    //                    match (self.map[&Coordinate { x, y, z }])
+    //                    {
+    //                        Status::Active => { print!("#") }
+    //                        Status::Inactive => { print!(".") }
+    //                    }
+    //                }
+    //            }
+    //            println!("");
+    //        }
+    //    }
+    //}
+
     fn add_point(&mut self, coordinate: Coordinate, status: Status) {
         self.map.insert(coordinate.clone(), status);
 
-        for z in -1..2 {
-            for y in -1..2 {
-                for x in -1..2 {
-                    if !(x == 0 && y == 0 && z == 0) && !self.map.contains_key(&Coordinate {
-                        x: x + coordinate.x,
-                        y: y + coordinate.y,
-                        z: z + coordinate.z,
-                    }) {
-                        self.map.insert(Coordinate {
+        for w in -1..2 {
+            for z in -1..2 {
+                for y in -1..2 {
+                    for x in -1..2 {
+                        if !(x == 0 && y == 0 && z == 0 && w == 0) && !self.map.contains_key(&Coordinate {
                             x: x + coordinate.x,
                             y: y + coordinate.y,
                             z: z + coordinate.z,
-                        }, Status::Inactive);
+                            w: w + coordinate.w,
+                        }) {
+                            self.map.insert(Coordinate {
+                                x: x + coordinate.x,
+                                y: y + coordinate.y,
+                                z: z + coordinate.z,
+                                w: w + coordinate.w,
+                            }, Status::Inactive);
+                        }
                     }
                 }
             }
@@ -80,16 +86,19 @@ impl Map {
     fn count_active_neighbors(&self, coordinate: &Coordinate) -> i32 {
         let mut coord_list = Vec::new();
 
-        for z in -1..2 {
-            for y in -1..2 {
-                for x in -1..2 {
-                    if !(x == 0 && y == 0 && z == 0) {
-                        coord_list.push(
-                            Coordinate {
-                                x: x + coordinate.x,
-                                y: y + coordinate.y,
-                                z: z + coordinate.z,
-                            });
+        for w in -1..2 {
+            for z in -1..2 {
+                for y in -1..2 {
+                    for x in -1..2 {
+                        if !(x == 0 && y == 0 && z == 0 && w == 0) {
+                            coord_list.push(
+                                Coordinate {
+                                    x: x + coordinate.x,
+                                    y: y + coordinate.y,
+                                    z: z + coordinate.z,
+                                    w: w + coordinate.w,
+                                });
+                        }
                     }
                 }
             }
@@ -115,8 +124,8 @@ fn parse_map() -> Map {
         let mut x = 0;
         for char in line.chars() {
             match char {
-                '#' => { map.add_point(Coordinate { x, y, z: 0 }, Status::Active) }
-                '.' => { map.add_point(Coordinate { x, y, z: 0 }, Status::Inactive) }
+                '#' => { map.add_point(Coordinate { x, y, z: 0, w: 0 }, Status::Active) }
+                '.' => { map.add_point(Coordinate { x, y, z: 0, w: 0 }, Status::Inactive) }
                 _ => { panic!("Not recognized") }
             }
             x += 1;
@@ -131,7 +140,7 @@ fn main() {
     //let mut map = Map::new();
     let mut map = parse_map();
 
-    map.print_map();
+    //map.print_map();
     for _i in 0..6 {
         let mut new_map = map.clone();
         for point in map.map.iter() {
