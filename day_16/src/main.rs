@@ -1,3 +1,5 @@
+use itertools::*;
+
 #[derive(Debug, Clone)]
 enum ParseState {
     Rules,
@@ -94,7 +96,24 @@ fn validate_ticket(ticket_num: i32, rule: &Rule) -> bool {
     false
 }
 
-fn main() {
+fn is_valid_ticket(ticket: &Vec<i32>, rule_list: &Vec<Rule>) -> bool {
+    let count: Vec<&i32> = ticket.iter().filter(|num| {
+        for rule in rule_list {
+            if validate_ticket(**num, &rule) {
+                return false;
+                break;
+            }
+        }
+        return true;
+    }).collect();
+    if count.len() >= 1 {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+fn part_1() {
     let (rule_list, your_ticket, other_tickets) = parse_file();
     let mut error_count = 0;
 
@@ -109,8 +128,36 @@ fn main() {
             }
             return true;
         }).collect();
-        error_count += count.iter().fold(0,|acc, num| acc+ **num);
+        error_count += count.iter().fold(0, |acc, num| acc + **num);
     }
 
     println!("{}", error_count);
+}
+
+fn check_whole_ticket(ticket: &Vec<i32>, rules: &Vec<&Rule>) -> bool {
+    for (idx, num) in ticket.iter().enumerate() {
+        if !validate_ticket(ticket[idx], &rules[idx]) {
+            return false;
+        }
+    }
+    true
+}
+
+fn main() {
+    // part_1();
+
+
+    let (rule_list, your_ticket, mut other_tickets) = parse_file();
+
+    other_tickets = other_tickets.into_iter().filter(|x| is_valid_ticket(x, &rule_list)).collect();
+
+    let mut valid_ticket = false;
+    for all_rules in rule_list.iter().permutations(your_ticket.len()) {
+        let count = other_tickets.iter().filter(|x| check_whole_ticket(x, &all_rules)).count();
+        if count as usize == your_ticket.len() {
+            println!("Found!");
+            println!("{:?}",all_rules);
+            break;
+        }
+    }
 }
