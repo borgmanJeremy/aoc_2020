@@ -20,6 +20,7 @@ struct Map {
     map: HashMap<Coordinate, Status>
 }
 
+
 impl Map {
     fn new() -> Map {
         Map { map: HashMap::new() }
@@ -104,44 +105,31 @@ impl Map {
         }
         count
     }
-
-    fn _add_border(&mut self) {
-        let min_x = self.map.clone().into_keys().map(|x| x.x).min().unwrap();
-        let max_x = self.map.clone().into_keys().map(|x| x.x).max().unwrap();
-
-        let min_y = self.map.clone().into_keys().map(|x| x.y).min().unwrap();
-        let max_y = self.map.clone().into_keys().map(|x| x.y).max().unwrap();
-
-        let min_z = self.map.clone().into_keys().map(|x| x.z).min().unwrap();
-        let max_z = self.map.clone().into_keys().map(|x| x.z).max().unwrap();
-
-        for x in min_x..max_x + 1 {
-            for y in min_y..max_y + 1 {
-                for z in min_z..max_z + 1 {
-                    if !self.map.contains_key(&Coordinate { x, y, z }) {
-                        self.map.insert(Coordinate { x, y, z }, Status::Inactive);
-                    }
-                }
-            }
-        }
-    }
 }
 
-fn main() {
+fn parse_map() -> Map {
+    let map_str = include_str!("../input/input_1.txt");
+    let mut y = 0;
     let mut map = Map::new();
+    for line in map_str.lines() {
+        let mut x = 0;
+        for char in line.chars() {
+            match char {
+                '#' => { map.add_point(Coordinate { x, y, z: 0 }, Status::Active) }
+                '.' => { map.add_point(Coordinate { x, y, z: 0 }, Status::Inactive) }
+                _ => { panic!("Not recognized") }
+            }
+            x += 1;
+        }
+        y -= 1;
+    }
+    map
+}
 
-    //Sample Map
-    map.add_point(Coordinate { x: 0, y: 0, z: 0 }, Status::Inactive);
-    map.add_point(Coordinate { x: 1, y: 0, z: 0 }, Status::Active);
-    map.add_point(Coordinate { x: 2, y: 0, z: 0 }, Status::Inactive);
 
-    map.add_point(Coordinate { x: 0, y: -1, z: 0 }, Status::Inactive);
-    map.add_point(Coordinate { x: 1, y: -1, z: 0 }, Status::Inactive);
-    map.add_point(Coordinate { x: 2, y: -1, z: 0 }, Status::Active);
-
-    map.add_point(Coordinate { x: 0, y: -2, z: 0 }, Status::Active);
-    map.add_point(Coordinate { x: 1, y: -2, z: 0 }, Status::Active);
-    map.add_point(Coordinate { x: 2, y: -2, z: 0 }, Status::Active);
+fn main() {
+    //let mut map = Map::new();
+    let mut map = parse_map();
 
     map.print_map();
     for _i in 0..6 {
@@ -163,7 +151,7 @@ fn main() {
             }
         }
         map = new_map;
-        map.print_map();
+        //map.print_map();
     }
     let final_count = map.map.iter().filter(|&x| *x.1 == Status::Active).count();
     println!("final count: {}", final_count);
