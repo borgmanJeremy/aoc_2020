@@ -151,13 +151,20 @@ fn main() {
 
     other_tickets = other_tickets.into_iter().filter(|x| is_valid_ticket(x, &rule_list)).collect();
 
-    let mut valid_ticket = false;
-    for all_rules in rule_list.iter().permutations(your_ticket.len()) {
-        let count = other_tickets.iter().filter(|x| check_whole_ticket(x, &all_rules)).count();
-        if count as usize == your_ticket.len() {
-            println!("Found!");
-            println!("{:?}",all_rules);
-            break;
+    let mut cols = Vec::new();
+    for idx in 0..other_tickets[0].len() {
+        let col: Vec<i32> = other_tickets.iter().flatten().enumerate().filter(|&x| x.0 % other_tickets[0].len() == idx).map(|x| *x.1).collect();
+        cols.push(col);
+    }
+
+    for (count,col) in cols.iter().enumerate() {
+        println!("col: {}",count);
+        for rule in &rule_list {
+            if col.iter().filter(|&&x| validate_ticket(x, &rule)).count() == cols[0].len() {
+                println!("{:?}", rule.name);
+            }
         }
     }
+
+    println!("Test");
 }
