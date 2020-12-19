@@ -179,13 +179,26 @@ impl Parser {
         }
     }
     fn expression(&mut self) -> Expression {
-        return self.addition();
+        return self.multiplication();
+    }
+
+    fn multiplication(&mut self) -> Expression {
+        let mut expr = self.addition();
+
+        while self.matcher(&vec![TokenType::Slash, TokenType::Star]) {
+            expr = Expression::Binary {
+                left: Box::new(expr),
+                operator: self.previous().clone(),
+                right: Box::new(self.addition()),
+            }
+        }
+        return expr;
     }
 
     fn addition(&mut self) -> Expression {
         let mut expr = self.unary();
 
-        while self.matcher(&vec![TokenType::Minus, TokenType::Plus, TokenType::Slash, TokenType::Star]) {
+        while self.matcher(&vec![TokenType::Minus, TokenType::Plus]) {
             expr = Expression::Binary {
                 left: Box::new(expr),
                 operator: self.previous().clone(),
